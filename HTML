@@ -1,0 +1,43 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.keys import Keys
+import time
+
+# Путь к chromedriver (замени на свой, если нужно)
+driver_path = "chromedriver.exe"
+service = Service(driver_path)
+
+# Запуск браузера
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")  # Без GUI
+driver = webdriver.Chrome(service=service, options=options)
+
+# URL категории книг (замени на нужную категорию)
+url = "https://read.ru/catalog/bestsellery/"
+driver.get(url)
+
+# Подождем загрузки
+time.sleep(3)
+
+# Найдем все книги на странице (ограничим 10 книг)
+books = driver.find_elements(By.CSS_SELECTOR, ".product-card")[:10]
+
+# Сбор информации
+for book in books:
+    try:
+        title = book.find_element(By.CSS_SELECTOR, ".product-card__name").text
+        author = book.find_element(By.CSS_SELECTOR, ".product-card__author").text
+        price = book.find_element(By.CSS_SELECTOR, ".product-card__price").text
+        rating = book.find_element(By.CSS_SELECTOR, ".product-card__rating").get_attribute("data-rating")
+
+        print(f"Название: {title}")
+        print(f"Автор: {author}")
+        print(f"Цена: {price}")
+        print(f"Рейтинг: {rating}")
+        print("-" * 30)
+    except Exception as e:
+        print("Ошибка:", e)
+
+# Закрываем браузер
+driver.quit()
